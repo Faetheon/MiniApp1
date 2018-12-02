@@ -1,13 +1,16 @@
 // Node modules
 import React from 'react';
 import styled from 'styled-components';
+import {BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom';
 
 // Components
 import MenuHeader from './menuComponents/MenuHeader.jsx'
 import Button from './interactiveElements/Button.jsx';
+import Login from './loginComponents/Login.jsx';
 
 // Functions
 import incrementMoney from '../../utils/incrementMoney.js';
+import login from '../../utils/login.js';
 
 // Styled components
 const ButtonContainer = styled.div`
@@ -32,23 +35,33 @@ class App extends React.Component {
 
         this.state = {
             money: 0,
-            incrementAmount: 1
+            incrementAmount: 1,
+            isLoggedIn: false
         }
 
         this.incrementMoney = incrementMoney.bind(this);
+        this.login = login.bind(this);
     }
 
     render() {
         return (
-            <div>
-                <MenuHeader />
-                <ButtonContainer>
-                    <MoneyText>
-                        You have ${this.state.money}
-                    </MoneyText>
-                    <Button incrementMoney={this.incrementMoney}/>
-                </ButtonContainer>
-            </div>
+            <Router>
+                <Route path="/*" render={() => (
+                    !this.isLoggedIn ? (
+                        <Login login={this.login}/>
+                    ) : (
+                        <div>
+                            <MenuHeader />
+                            <ButtonContainer>
+                                <MoneyText>
+                                    You have ${this.state.money}
+                                </MoneyText>
+                                <Button incrementMoney={this.incrementMoney}/>
+                            </ButtonContainer>
+                        </div>
+                    )
+                )} />
+            </Router>
         )
     }
 }
