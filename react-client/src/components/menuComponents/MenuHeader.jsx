@@ -6,22 +6,8 @@ const Header = styled.div`
     background-image: linear-gradient(grey, white);
 `;
 
-class MenuHeader extends React.Component {
-    constructor() {
-        super();
-
-        this.state = {
-            val: 1
-        }
-    }
-
-    render() {
-        return (
-            <Header>
-                Hello World!
-            </Header>
-        );
-    }
-}
+const MenuHeader = (props) => (
+    <Header />
+);
 
 export default MenuHeader;

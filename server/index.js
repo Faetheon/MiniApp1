@@ -12,6 +12,7 @@ const client = new Client(dbUrl, {
     user: USER,
     password: PASSWORD
 });
+client.connect()
 const app = express();
 
 app.use(express.static(`${__dirname}/../react-client/dist/`));
@@ -23,46 +24,84 @@ app.get('/:updateMoney/:username', (req, res) => {
     // User Name
     const UN = req.params.username
     
-    client.connect()
-    client.query(`SELECT * FROM users_data WHERE score_id = (SELECT id FROM users WHERE username='${UN}')`)
-        .then((res) => {
-            console.log(res);
+    client.query(`UPDATE users_data SET score=(SELECT score FROM users_data WHERE score_id=(SELECT id FROM users WHERE username='${UN}'))+${UA} WHERE score_id = (SELECT id FROM users WHERE username='${UN}')`)
+        .then((result) => {
             res.status(200).send();
         })
         .catch(err => {
             if (err) throw err;
             res.status(400).send();
         });
-
+        client.query(`SELECT score,high_score FROM users_data WHERE score_id=(SELECT id FROM users WHERE username='${UN}');`)
+            .then(result => {
+                if (result.rows[0].score > result.rows[0].high_score) {
+                    client.query(`UPDATE users_data SET high_score=(SELECT score FROM users_data WHERE score_id=(SELECT id FROM users WHERE username='${UN}')) WHERE score_id = (SELECT id FROM users WHERE username='${UN}');`)
+                        .catch(err => {
+                            if (err) throw err;
+                        })
+                }
+            })
+            .catch(err  => {
+                if (err) throw err;
+            });
 });
 
 app.get('/login/:username/:password', (req, res) => {
-    // client.connect();
-    // client.query(`INSERT INTO users (username, password) VALUES ('${req.params.username}', '${req.params.password}');`)
-    //     .then(() => {
-    //         client.query(`INSERT INTO users_score (high_score, score) VALUES (0, 0, '0, 0, 0');`)
-    //             .then(res => {
-    //                 client.end();
-    //                 console.log(res);
-    //             })
-    //             .catch(err => {
-    //                 if (err) throw err;
-    //                 client.end();
-    //             });
-    //     })
-    //     .catch(err => {
-    //         if (err) {
-    //             console.log(err);
-    //             res.status(400).send();
-    //         } else {
-                res.status(201).send();
-        //     }
-        //     client.end();
-        // });
+    const {username, password} = req.params;
+    client.query(`SELECT * FROM users_data WHERE score_id=(SELECT id FROM users WHERE username='${username}' AND password='${password}')`)
+        .then((data) => {
+            if (data.rowCount === 0) {
+                throw 'User not found';
+            } else {
+                res.json(data.rows[0]);
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            client.query(`INSERT INTO users (id, username, password) VALUES ((SELECT MAX(id) FROM users)+1, '${username}', '${password}');`)
+                .then(() => {
+                    client.query(`INSERT INTO users_data (score_id, high_score, score, workers) VALUES ((SELECT id FROM users WHERE username='${username}'), 0, 0, '0, 0, 0');`)
+                        .then(result => {
+                            console.log(result);
+                            res.status(201).send();
+                        })
+                        .catch(err => {
+                            if (err) throw err;
+                            res.status(400).send();
+                        });
+                })
+                .catch(err => {
+                    if (err) {
+                        console.log(err);
+                        res.status(400).send();
+                    } else {
+                        res.status(201).send();
+                    }
+                });
+        });
+});
+
+app.get('/update', (req, res) => {
+    let rows = [];
+    client.query("SELECT username FROM users LIMIT 10;")
+        .then(result => {
+            rows.push(result.rows);
+            client.query("SELECT * FROM users_data LIMIT 10")
+                .then(result => {
+                    rows.push(result.rows);
+                    res.json(rows);
+                })
+                .catch(err => {
+                    if (err) throw err;
+                });
+        })
+        .catch(err => {
+            if (err) throw err;
+        });
 });
 
 app.get('/*', (req, res) => {
-    res.status(304).sendFile(`${__dirname}/../react-client/dist/index.html`)
+    res.status(304).send(`${__dirname}/../react-client/dist/index.html`)
 });
 
 app.listen(PORT, () => {
@@ -72,7 +111,6 @@ app.listen(PORT, () => {
 
 /* 
     SCHEMA INFO:
-        client.connect();
         client.query("CREATE TABLE users (id INT SERIAL PRIMARY KEY, username UNIQUE VARCHAR(20), password VARCHAR(64));", (err, res) => {
             client.query("CREATE TABLE users_data (score_id SERIAL PRIMARY KEY, high_score INTEGER, score INTEGER, workers character(7);", (err, res) => {
                     if (err) throw err;
