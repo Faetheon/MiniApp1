@@ -5,14 +5,17 @@ export default function login(username, password) {
         fetch(`/login/${username}/${encrypt.SHA256(password).toString()}`)
             .then(res => res.json())
             .then(res => {
-                if (/2..|3../.test(JSON.stringify(res.status)) || typeof res.score === 'number') {
+                if (typeof res.score === 'number') {
                     this.setState({username: username, isLoggedIn: true, money: res.score});
-                } else {
-                    alert('Sorry that username is already taken.');
+                }
+                if (res.nope) {
+                    alert('Sorry that username is already taken');
+                } else if (!res.nope) {
+                    alert(`No account with that name found, created account ${username}.\nPlease login now.`);
                 }
             })
             .catch(err => {
-                if (err) console.log(err);
-            })
+                if (err) throw err;
+            });
     }
 }

@@ -15,7 +15,7 @@ const Login = ({login, history}) => (
     <Form onSubmit={(e) => {e.preventDefault(); login(e.target.username.value, e.target.password.value);}}>
         <input type='text' name='username' style={{marginTop: "15px"}} placeholder="Username"/>
         <input type='text' name='password' style={{marginTop: "15px"}} placeholder="Password"/>
-        <input type="Submit" style={{marginTop: "15px"}}/>
+        <input type="Submit" style={{marginTop: "15px"}} />
     </Form>
 );
 

@@ -18,6 +18,20 @@ const app = express();
 app.use(express.static(`${__dirname}/../react-client/dist/`));
 app.use(cors());
 
+app.get('/deleteAccount/:username', (req, res) => {
+    const username = req.params.username;
+    client.query(`DELETE FROM users_data WHERE score_id=(SELECT id FROM users WHERE username='${username}');`)
+        .then(() => {
+            client.query(`DELETE FROM users WHERE username='${username}'`)
+                .catch(err => {
+                    if (err) throw err;
+                });
+        })
+        .catch(err => {
+            if (err) throw err;
+        });
+});
+
 app.get('/:updateMoney/:username', (req, res) => {
     // Update Amount
     const UA = req.params.updateMoney;
@@ -62,20 +76,19 @@ app.get('/login/:username/:password', (req, res) => {
                 .then(() => {
                     client.query(`INSERT INTO users_data (score_id, high_score, score, workers) VALUES ((SELECT id FROM users WHERE username='${username}'), 0, 0, '0, 0, 0');`)
                         .then(result => {
-                            console.log(result);
-                            res.status(201).send();
+                            res.json({nope: false});
                         })
                         .catch(err => {
                             if (err) throw err;
-                            res.status(400).send();
+                            res.json({nope: true});
                         });
                 })
                 .catch(err => {
                     if (err) {
                         console.log(err);
-                        res.status(400).send();
+                        res.json({nope: true});
                     } else {
-                        res.status(201).send();
+                        res.json({nope: false});
                     }
                 });
         });
@@ -86,7 +99,6 @@ app.get('/update', (req, res) => {
     let timeout;
     client.query("SELECT * FROM users_data ORDER BY high_score DESC LIMIT 10;")
         .then(result => {
-            console.log(result.rows);
             rows.push(result.rows);
             rows[1] = [];
             rows[0].forEach(score => {

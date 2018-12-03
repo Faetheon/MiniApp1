@@ -13,6 +13,7 @@ import ScoreBoard from './menuComponents/ScoreBoard.jsx';
 import incrementMoney from '../../utils/incrementMoney.js';
 import login from '../../utils/login.js';
 import updateScoreBoard from '../../utils/updateScoreBoard.js';
+import deleteAccount from '../../utils/deleteAccount.js';
 
 // Styled components
 const ButtonContainer = styled.div`
@@ -45,6 +46,7 @@ class App extends React.Component {
         this.incrementMoney = incrementMoney.bind(this);
         this.login = login.bind(this);
         this.updateScoreBoard = updateScoreBoard.bind(this);
+        this.deleteAccount = deleteAccount.bind(this);
     }
 
     componentDidMount() {
@@ -67,6 +69,7 @@ class App extends React.Component {
                                     You have ${this.state.money}
                                 </MoneyText>
                                 <Button incrementMoney={this.incrementMoney}/>
+                                <button style={{marginTop: '30px'}} onClick={() => {this.deleteAccount(); this.setState({isLoggedIn: false, username: ''})}}>Delete Account</button>
                             </ButtonContainer>
                         </div>
                             :
