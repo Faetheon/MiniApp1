@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev:build": "webpack -d -w",
-    "dev:start": "nodemon server/index.js"
+    "dev:start": "nodemon server/index.js",
+    "start": "node server/index.js",
+    "prod:build": "webpack -p"
   },
   "author": "Nathan Hill",
   "license": "ISC",
