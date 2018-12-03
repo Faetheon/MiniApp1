@@ -4,11 +4,10 @@ export default function updateScoreBoard() {
         .then(data => {
             const users = [];
             const scores = [];
-           data[0].forEach(username => {
-                console.log(username);
-                users.push(username.username.replace(/\s/g, ''));
+           data[1].forEach(username => {
+                users.push(username[0].username.replace(/\s/g, ''));
             });
-            data[1].forEach(score => {
+            data[0].forEach(score => {
                 scores.push(score);
             });
 

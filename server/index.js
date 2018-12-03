@@ -82,18 +82,26 @@ app.get('/login/:username/:password', (req, res) => {
 });
 
 app.get('/update', (req, res) => {
-    let rows = [];
-    client.query("SELECT username FROM users LIMIT 10;")
+    const rows = [];
+    let timeout;
+    client.query("SELECT * FROM users_data ORDER BY high_score DESC LIMIT 10;")
         .then(result => {
+            console.log(result.rows);
             rows.push(result.rows);
-            client.query("SELECT * FROM users_data LIMIT 10")
-                .then(result => {
-                    rows.push(result.rows);
-                    res.json(rows);
-                })
-                .catch(err => {
-                    if (err) throw err;
-                });
+            rows[1] = [];
+            rows[0].forEach(score => {
+                client.query(`SELECT username FROM users WHERE id=${score.score_id}`)
+                    .then(result => {
+                        clearTimeout(timeout);
+                        rows[1].push(result.rows);
+                        timeout = setTimeout(() => {
+                            res.json(rows);
+                        }, 1000);
+                    })
+                    .catch(err => {
+                        if (err) throw err;
+                    });
+            });
         })
         .catch(err => {
             if (err) throw err;
