@@ -67,7 +67,13 @@ class App extends React.Component {
                             <MenuHeader />
                             <ScoreBoard usernames={this.state.scoreBoardUsernames} scores={this.state.scoreBoardScores}/>
                             <ButtonContainer>
-                                <button style={{marginTop: '30px'}} onClick={() => {this.upgrade(); this.setState({money: this.state.money - 100, incrementAmount: this.state.incrementAmount + 1})}}>Upgrade</button>
+                                <button style={{marginTop: '30px'}} onClick={() => {this.state.money - 100 >= 0 ?  this.upgrade() : false; 
+                                        this.setState({
+                                            money: this.state.money - 100 >= 0 ? this.state.money - 100 : this.state.money,
+                                            incrementAmount: this.state.money - 100 >= 0 ? this.state.incrementAmount + 1 : this.state.incrementAmount
+                                            })
+                                        }
+                                    }>Upgrade</button>
                                 <MoneyText>
                                     You have ${this.state.money}
                                 </MoneyText>

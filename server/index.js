@@ -121,7 +121,13 @@ app.get('/update', (req, res) => {
 
 app.get('/upgrade/:money/:helpers/:username', (req, res) => {
     const {money, helpers, username} = req.params;
-    client.query(`UPDATE users`)
+    client.query(`UPDATE users_data SET workers='${helpers}', score=${money} WHERE score_id=(SELECT id FROM users WHERE username='${username}');`)
+        .then(() => {
+            res.status(200).send();
+        })
+        .catch(err => {
+            console.error(err);
+        });
 });
 
 app.get('/*', (req, res) => {
