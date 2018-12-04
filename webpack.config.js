@@ -19,7 +19,7 @@ module.exports = {
     }]
   },
   output: {
-    filename: 'prod.js',
+    filename: 'bundle.js',
     path: DIST_DIR
   },
   watchOptions: {

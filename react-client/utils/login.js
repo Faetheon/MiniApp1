@@ -13,10 +13,9 @@ export default function login(username, password) {
                     });
                     console.log(helpers);
                     this.setState({username: username, isLoggedIn: true, money: res.score, helpers: helpers, incrementAmount: helpers[0] + 1});
-                }
-                if (res.nope) {
+                } else if (res.nope) {
                     alert('Sorry that username is already taken');
-                } else if (!res.nope) {
+                } else if (!res.nope && !typeof res.score !== 'number') {
                     alert(`No account with that name found, created account ${username}.\nPlease login now.`);
                 }
             })
