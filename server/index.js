@@ -66,9 +66,8 @@ app.get('/login/:username/:password', (req, res) => {
         .then((data) => {
             if (data.rowCount === 0) {
                 throw 'User not found';
-            } else {
-                res.json(data.rows[0]);
             }
+            res.json(data.rows[0]);
         })
         .catch(err => {
             console.log(err);
@@ -118,6 +117,11 @@ app.get('/update', (req, res) => {
         .catch(err => {
             if (err) throw err;
         });
+});
+
+app.get('/upgrade/:money/:helpers/:username', (req, res) => {
+    const {money, helpers, username} = req.params;
+    client.query(`UPDATE users`)
 });
 
 app.get('/*', (req, res) => {

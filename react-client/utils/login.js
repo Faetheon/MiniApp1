@@ -6,7 +6,11 @@ export default function login(username, password) {
             .then(res => res.json())
             .then(res => {
                 if (typeof res.score === 'number') {
-                    this.setState({username: username, isLoggedIn: true, money: res.score});
+                    let helpers = res.workers.split(',');
+                    helpers.forEach((helper, i) => {
+                        helpers[i] = Number(helper);
+                    });
+                    this.setState({username: username, isLoggedIn: true, money: res.score, helpers: helpers, incrementAmount: helpers[0] + 1});
                 }
                 if (res.nope) {
                     alert('Sorry that username is already taken');
