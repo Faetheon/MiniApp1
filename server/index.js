@@ -60,6 +60,11 @@ app.get('/:updateMoney/:username', (req, res) => {
             });
 });
 
+app.put('/test', (req, res) => {
+    console.log(req.body);
+    res.send(200);
+});
+
 app.get('/login/:username/:password', (req, res) => {
     const {username, password} = req.params;
     client.query(`SELECT * FROM users_data WHERE score_id=(SELECT id FROM users WHERE username='${username}' AND password='${password}')`)
